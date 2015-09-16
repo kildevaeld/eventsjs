@@ -2,7 +2,7 @@
   "name": "eventsjs",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "lib/events.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,5 +12,8 @@
     "gulp": "^3.9.0",
     "gulp-typescript": "^2.8.0",
     "merge2": "^0.3.6"
+  },
+  "typesript": {
+    "definition": "lib/events.d.ts"
   }
 }

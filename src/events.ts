@@ -12,7 +12,7 @@ export interface Events {
   name: string
   once: boolean
   handler: EventHandler
-  ctx: any
+  ctx?: any
 }
 
 export interface IEventEmitter {
@@ -22,29 +22,46 @@ export interface IEventEmitter {
   once(event: string, fn:EventHandler, ctx?:any): any
   off (event: string, fn?:EventHandler, ctx?:any): any
   trigger (event: string, ...args:any[]): any
+}
 
+export interface Destroyable {
+  destroy()
+}
+
+export function callFunc (fn:Function[],ctx?:any,args:any[] = []) {
+  let l = fn.length, i = -1, a1 = args[0], a2 = args[1], 
+    a3 = args[2], a4 = args[3];
+    
+   switch (args.length) {
+     case 0: while (++i < l) fn[i].call(ctx); return;
+     case 1: while (++i < l) fn[i].call(ctx, a1); return;
+     case 2: while (++i < l) fn[i].call(ctx, a1, a2); return;
+     case 3: while (++i < l) fn[i].call(ctx, a1, a2, a3); return;
+     case 4: while (++i < l) fn[i].call(ctx, a1, a2, a3, a4); return;
+     default: while (++i < l) fn[i].apply(ctx, args); return;
+   }
 }
 
 
-export class EventEmitter implements IEventEmitter {
+export class EventEmitter implements IEventEmitter, Destroyable {
   static debugCallback: (className:string, name:string, event:string, args:any[]) => void
-  
-  
+
+
   listenId: string
   private _listeners: { [key: string]: Events[] }
   private _listeningTo: { [key: string]: any }
-  
+
   public get listeners (): {[key: string]: Events[]} {
     return this._listeners
   }
   on (event: string, fn:EventHandler, ctx?:any, once:boolean = false): any {
     let events = (this._listeners|| (this._listeners = {}))[event]||(this._listeners[event]=[])
-   
+
     events.push({
       name: event,
       once: once,
-      handler: fn,
-      ctx: ctx||this
+      handler: fn.bind(ctx||this)/*,
+      ctx: ctx||this*/
     })
     return this
   }
@@ -77,30 +94,34 @@ export class EventEmitter implements IEventEmitter {
     let events = (this._listeners|| (this._listeners = {}))[eventName]||(this._listeners[eventName]=[])
     .concat(this._listeners['all']||[])
 
-    if (EventEmitter.debugCallback) 
+    if (EventEmitter.debugCallback)
       EventEmitter.debugCallback((<any>this.constructor).name, (<any>this).name, eventName, args)
-    
+
     let event, a, len = events.length, index, i
-    
+    let calls: Function[] = []
     for (i=0;i<events.length;i++) {
       event = events[i]
       a = args
-      
+
       if (event.name == 'all') {
         a = [eventName].concat(args)
+        callFunc([event.handler], event.ctx, a);
       }
 
-      event.handler.apply(event.ctx, a)
+      calls.push(event.handler)
       
+
       if (event.once === true) {
-       
+
         index = this._listeners[event.name].indexOf(event)
         this._listeners[event.name].splice(index,1)
       }
     }
     
+    callFunc(calls, undefined, args);
+
     return this
-    
+
   }
 
   listenTo (obj: IEventEmitter, event: string, fn:EventHandler, ctx?:any, once:boolean = false): any {
@@ -132,5 +153,10 @@ export class EventEmitter implements IEventEmitter {
         if (remove || !Object.keys(obj.listeners).length) delete this._listeningTo[id];
       }
       return this;
+  }
+  
+  destroy () {
+    this.stopListening();
+    this.off();
   }
 }
