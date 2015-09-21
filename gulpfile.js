@@ -3,7 +3,7 @@
 const gulp = require('gulp'),
       merge = require('merge2'),
       tsc = require('gulp-typescript');
-			
+
 
 gulp.task('build', function () {
 
@@ -31,3 +31,5 @@ gulp.task('build', function () {
   return merge([js,dts]);
 
 });
+
+gulp.task('default', ['build']);

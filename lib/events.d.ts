@@ -23,6 +23,7 @@ export interface Destroyable {
 export declare function callFunc(fn: Function[], ctx?: any, args?: any[]): void;
 export declare class EventEmitter implements IEventEmitter, Destroyable {
     static debugCallback: (className: string, name: string, event: string, args: any[]) => void;
+    static executeListenerFunction: (func: Function[], ctx: any, args?: any[]) => void;
     listenId: string;
     private _listeners;
     private _listeningTo;
@@ -33,6 +34,7 @@ export declare class EventEmitter implements IEventEmitter, Destroyable {
     once(event: string, fn: EventHandler, ctx?: any): any;
     off(eventName?: string, fn?: EventHandler): any;
     trigger(eventName: string, ...args: any[]): any;
+    _executeListener(func: Function[], ctx: any, args?: any[]): void;
     listenTo(obj: IEventEmitter, event: string, fn: EventHandler, ctx?: any, once?: boolean): any;
     listenToOnce(obj: IEventEmitter, event: string, fn: EventHandler, ctx?: any): any;
     stopListening(obj?: IEventEmitter, event?: string, callback?: EventHandler): EventEmitter;

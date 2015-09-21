@@ -29,9 +29,9 @@ export interface Destroyable {
 }
 
 export function callFunc (fn:Function[],ctx?:any,args:any[] = []) {
-  let l = fn.length, i = -1, a1 = args[0], a2 = args[1], 
+  let l = fn.length, i = -1, a1 = args[0], a2 = args[1],
     a3 = args[2], a4 = args[3];
-    
+
    switch (args.length) {
      case 0: while (++i < l) fn[i].call(ctx); return;
      case 1: while (++i < l) fn[i].call(ctx, a1); return;
@@ -45,7 +45,9 @@ export function callFunc (fn:Function[],ctx?:any,args:any[] = []) {
 
 export class EventEmitter implements IEventEmitter, Destroyable {
   static debugCallback: (className:string, name:string, event:string, args:any[]) => void
+  static executeListenerFunction: (func:Function[], ctx:any, args?: any[]) => void = function () {
 
+  }
 
   listenId: string
   private _listeners: { [key: string]: Events[] }
@@ -71,6 +73,7 @@ export class EventEmitter implements IEventEmitter, Destroyable {
   }
 
   off (eventName?: string, fn?:EventHandler): any {
+      this._listeners = this._listeners || {};
     if (eventName == null) {
       this._listeners = {}
     } else if (this._listeners[eventName]){
@@ -109,7 +112,7 @@ export class EventEmitter implements IEventEmitter, Destroyable {
       }
 
       calls.push(event.handler)
-      
+
 
       if (event.once === true) {
 
@@ -117,11 +120,19 @@ export class EventEmitter implements IEventEmitter, Destroyable {
         this._listeners[event.name].splice(index,1)
       }
     }
-    
+    this._executeListener(calls, undefined, args);
     callFunc(calls, undefined, args);
 
     return this
 
+  }
+
+  _executeListener(func: Function[], ctx: any, args?: any[]) {
+      let executor = callFunc;
+      if ((<any>this.constructor).executeListenerFunction) {
+         executor = (<any>this.constructor).executeListenerFunction
+      }
+      executor(func, ctx, args);
   }
 
   listenTo (obj: IEventEmitter, event: string, fn:EventHandler, ctx?:any, once:boolean = false): any {
@@ -154,7 +165,7 @@ export class EventEmitter implements IEventEmitter, Destroyable {
       }
       return this;
   }
-  
+
   destroy () {
     this.stopListening();
     this.off();
