@@ -13,7 +13,8 @@
     "gulp-typescript": "^2.8.0",
     "merge2": "^0.3.6"
   },
-  "typesript": {
+  "typescript": {
     "definition": "lib/events.d.ts"
-  }
+  },
+  "typings": "lib/events"
 }
