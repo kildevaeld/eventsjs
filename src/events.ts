@@ -108,7 +108,7 @@ export class EventEmitter implements IEventEmitter, Destroyable {
         a = [eventName].concat(args)
         callFunc([event], a);
       } else {
-        calls.push(event.handler)
+        calls.push(event)
       }
 
       if (event.once === true) {
