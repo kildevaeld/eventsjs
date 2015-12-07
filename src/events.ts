@@ -28,26 +28,24 @@ export interface Destroyable {
   destroy()
 }
 
-export function callFunc (fn:Function[],ctx?:any,args:any[] = []) {
+export function callFunc (fn:Events[], args:any[] = []) {
   let l = fn.length, i = -1, a1 = args[0], a2 = args[1],
     a3 = args[2], a4 = args[3];
 
    switch (args.length) {
-     case 0: while (++i < l) fn[i].call(ctx); return;
-     case 1: while (++i < l) fn[i].call(ctx, a1); return;
-     case 2: while (++i < l) fn[i].call(ctx, a1, a2); return;
-     case 3: while (++i < l) fn[i].call(ctx, a1, a2, a3); return;
-     case 4: while (++i < l) fn[i].call(ctx, a1, a2, a3, a4); return;
-     default: while (++i < l) fn[i].apply(ctx, args); return;
+     case 0: while (++i < l) fn[i].handler.call(fn[i].ctx); return;
+     case 1: while (++i < l) fn[i].handler.call(fn[i].ctx, a1); return;
+     case 2: while (++i < l) fn[i].handler.call(fn[i].ctx, a1, a2); return;
+     case 3: while (++i < l) fn[i].handler.call(fn[i].ctx, a1, a2, a3); return;
+     case 4: while (++i < l) fn[i].handler.call(fn[i].ctx, a1, a2, a3, a4); return;
+     default: while (++i < l) fn[i].handler.apply(fn[i].ctx, args); return;
    }
 }
 
 
 export class EventEmitter implements IEventEmitter, Destroyable {
   static debugCallback: (className:string, name:string, event:string, args:any[]) => void
-  static executeListenerFunction: (func:Function[], ctx:any, args?: any[]) => void = function () {
-
-  }
+  static executeListenerFunction: (func:Function[], args?: any[]) => void
 
   listenId: string
   private _listeners: { [key: string]: Events[] }
@@ -101,18 +99,17 @@ export class EventEmitter implements IEventEmitter, Destroyable {
       EventEmitter.debugCallback((<any>this.constructor).name, (<any>this).name, eventName, args)
 
     let event, a, len = events.length, index, i
-    let calls: Function[] = []
+    let calls: Events[] = []
     for (i=0;i<events.length;i++) {
       event = events[i]
       a = args
 
       if (event.name == 'all') {
         a = [eventName].concat(args)
-        callFunc([event.handler], event.ctx, a);
+        callFunc([event], a);
+      } else {
+        calls.push(event.handler)
       }
-
-      calls.push(event.handler)
-
 
       if (event.once === true) {
 
@@ -120,19 +117,19 @@ export class EventEmitter implements IEventEmitter, Destroyable {
         this._listeners[event.name].splice(index,1)
       }
     }
-    this._executeListener(calls, undefined, args);
-    callFunc(calls, undefined, args);
+
+    if (calls.length) this._executeListener(calls, args);
 
     return this
 
   }
 
-  _executeListener(func: Function[], ctx: any, args?: any[]) {
+  _executeListener(func: Events[], args?: any[]) {
       let executor = callFunc;
       if ((<any>this.constructor).executeListenerFunction) {
          executor = (<any>this.constructor).executeListenerFunction
       }
-      executor(func, ctx, args);
+      executor(func, args);
   }
 
   listenTo (obj: IEventEmitter, event: string, fn:EventHandler, ctx?:any, once:boolean = false): any {
