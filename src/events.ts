@@ -62,8 +62,8 @@ export class EventEmitter implements IEventEmitter, Destroyable {
     events.push({
       name: event,
       once: once,
-      handler: fn.bind(ctx||this)/*,
-      ctx: ctx||this*/
+      handler: fn,
+      ctx: ctx||this
     })
     return this
   }
