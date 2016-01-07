@@ -149,11 +149,12 @@ export class EventEmitter implements IEventEmitter, Destroyable {
   }
 
   stopListening (obj?: IEventEmitter, event?:string, callback?:EventHandler) {
-      let listeningTo = this._listeningTo||{};
-
+      let listeningTo: any = this._listeningTo;
+      if (!listeningTo) return this;
       var remove = !event && !callback;
-      if (obj) listeningTo[obj.listenId] = obj;
-
+      if (!callback && typeof event === 'object') callback = <any>this;
+      if (obj) (listeningTo = {})[obj.listenId] = obj;
+      
       for (var id in listeningTo) {
         obj = listeningTo[id];
         obj.off(event, callback, this);
