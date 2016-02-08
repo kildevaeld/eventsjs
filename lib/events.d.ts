@@ -27,7 +27,7 @@ export declare class EventEmitter implements IEventEmitter, Destroyable {
     listenId: string;
     private _listeners;
     private _listeningTo;
-    readonly listeners: {
+    listeners: {
         [key: string]: Events[];
     };
     on(event: string, fn: EventHandler, ctx?: any, once?: boolean): any;
