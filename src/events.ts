@@ -17,7 +17,7 @@ export interface Events {
 
 export interface IEventEmitter {
   listeners: {[key: string]: Events[]}
-  listenId: string
+  listenId?: string
   on (event: string, fn:EventHandler, ctx?:any): any
   once(event: string, fn:EventHandler, ctx?:any): any
   off (event: string, fn?:EventHandler, ctx?:any): any
@@ -52,37 +52,39 @@ export class EventEmitter implements IEventEmitter, Destroyable {
   private _listeningTo: { [key: string]: any }
 
   public get listeners (): {[key: string]: Events[]} {
-    return this._listeners
+    return this._listeners;
   }
+
   on (event: string, fn:EventHandler, ctx?:any, once:boolean = false): any {
-    let events = (this._listeners|| (this._listeners = {}))[event]||(this._listeners[event]=[])
+    let events = (this._listeners|| (this._listeners = {}))[event]||(this._listeners[event]=[]);
 
     events.push({
       name: event,
       once: once,
       handler: fn,
       ctx: ctx||this
-    })
+    });
+
     return this
   }
 
   once (event: string, fn:EventHandler, ctx?:any): any {
-    return this.on(event, fn, ctx, true)
+    return this.on(event, fn, ctx, true);
   }
 
   off (eventName?: string, fn?:EventHandler): any {
       this._listeners = this._listeners || {};
     if (eventName == null) {
-      this._listeners = {}
+      this._listeners = {};
     } else if (this._listeners[eventName]){
-      let events = this._listeners[eventName]
+      let events = this._listeners[eventName];
       if (fn == null) {
-        this._listeners[eventName] = []
+        this._listeners[eventName] = [];
       } else {
         for (let i=0;i<events.length;i++) {
-          let event = events[i]
+          let event = events[i];
           if (events[i].handler == fn) {
-            this._listeners[eventName].splice(i,1)
+            this._listeners[eventName].splice(i,1);
           }
         }
       }
@@ -98,9 +100,9 @@ export class EventEmitter implements IEventEmitter, Destroyable {
     if (EventEmitter.debugCallback)
       EventEmitter.debugCallback((<any>this.constructor).name, (<any>this).name, eventName, args)
 
-    let event, a, len = events.length, index, i
-    let calls: Events[] = []
-    for (i=0;i<events.length;i++) {
+    let event, a, len = events.length, index;
+    let calls: Events[] = [];
+    for (let i=0, ii = events.length;i<ii;i++) {
       event = events[i]
       a = args
 
@@ -112,7 +114,6 @@ export class EventEmitter implements IEventEmitter, Destroyable {
       }
 
       if (event.once === true) {
-
         index = this._listeners[event.name].indexOf(event)
         this._listeners[event.name].splice(index,1)
       }
@@ -120,7 +121,7 @@ export class EventEmitter implements IEventEmitter, Destroyable {
 
     if (calls.length) this._executeListener(calls, args);
 
-    return this
+    return this;
 
   }
 
@@ -133,7 +134,7 @@ export class EventEmitter implements IEventEmitter, Destroyable {
   }
 
   listenTo (obj: IEventEmitter, event: string, fn:EventHandler, ctx?:any, once:boolean = false): any {
-      let listeningTo, id, meth
+      let listeningTo, id, meth;
       listeningTo = this._listeningTo|| (this._listeningTo = {});
       id = obj.listenId || (obj.listenId = getID())
       listeningTo[id] = obj;
@@ -154,7 +155,7 @@ export class EventEmitter implements IEventEmitter, Destroyable {
       var remove = !event && !callback;
       if (!callback && typeof event === 'object') callback = <any>this;
       if (obj) (listeningTo = {})[obj.listenId] = obj;
-      
+
       for (var id in listeningTo) {
         obj = listeningTo[id];
         obj.off(event, callback, this);

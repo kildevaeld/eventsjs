@@ -4,24 +4,14 @@ const gulp = require('gulp'),
       merge = require('merge2'),
       tsc = require('gulp-typescript');
 
+const project = tsc.createProject('./tsconfig.json', {
+  typescript: require('typescript')
+});
 
 gulp.task('build', function () {
 
-  let result = gulp.src('./src/*.ts')
-  .pipe(tsc({
-    "target": "ES5",
-    "module": "commonjs",
-    "isolatedModules": false,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "declaration": true,
-    "noImplicitAny": false,
-    "removeComments": false,
-    "noLib": false,
-    "preserveConstEnums": true,
-    "suppressImplicitAnyIndexErrors": true,
-    declarationFiles: true
-  }));
+  let result = project.src()
+  .pipe(tsc(project));
 
   let js = result.js
   .pipe(gulp.dest('./lib'));

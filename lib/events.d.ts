@@ -11,7 +11,7 @@ export interface IEventEmitter {
     listeners: {
         [key: string]: Events[];
     };
-    listenId: string;
+    listenId?: string;
     on(event: string, fn: EventHandler, ctx?: any): any;
     once(event: string, fn: EventHandler, ctx?: any): any;
     off(event: string, fn?: EventHandler, ctx?: any): any;
@@ -27,7 +27,7 @@ export declare class EventEmitter implements IEventEmitter, Destroyable {
     listenId: string;
     private _listeners;
     private _listeningTo;
-    listeners: {
+    readonly listeners: {
         [key: string]: Events[];
     };
     on(event: string, fn: EventHandler, ctx?: any, once?: boolean): any;
@@ -37,6 +37,6 @@ export declare class EventEmitter implements IEventEmitter, Destroyable {
     _executeListener(func: Events[], args?: any[]): void;
     listenTo(obj: IEventEmitter, event: string, fn: EventHandler, ctx?: any, once?: boolean): any;
     listenToOnce(obj: IEventEmitter, event: string, fn: EventHandler, ctx?: any): any;
-    stopListening(obj?: IEventEmitter, event?: string, callback?: EventHandler): EventEmitter;
+    stopListening(obj?: IEventEmitter, event?: string, callback?: EventHandler): this;
     destroy(): void;
 }
