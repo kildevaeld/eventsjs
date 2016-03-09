@@ -21,6 +21,8 @@ export interface Destroyable {
     destroy(): any;
 }
 export declare function callFunc(fn: Events[], args?: any[]): void;
+export declare function isFunction(a: any): a is Function;
+export declare function isEventEmitter(a: any): a is EventEmitter;
 export declare class EventEmitter implements IEventEmitter, Destroyable {
     static debugCallback: (className: string, name: string, event: string, args: any[]) => void;
     static executeListenerFunction: (func: Function[], args?: any[]) => void;

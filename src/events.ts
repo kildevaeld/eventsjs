@@ -42,6 +42,14 @@ export function callFunc (fn:Events[], args:any[] = []) {
    }
 }
 
+export function isFunction (a:any): a is Function {
+  return typeof a === 'function';
+}
+
+export function isEventEmitter(a:any): a is EventEmitter {
+  return a instanceof EventEmitter || (a.listenId && isFunction(a.on) && isFunction(a.off) && isFunction(a.trigger));
+}
+
 
 export class EventEmitter implements IEventEmitter, Destroyable {
   static debugCallback: (className:string, name:string, event:string, args:any[]) => void
