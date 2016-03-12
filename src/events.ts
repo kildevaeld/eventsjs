@@ -52,7 +52,7 @@ export function isEventEmitter(a:any): a is EventEmitter {
 
 
 export class EventEmitter implements IEventEmitter, Destroyable {
-  static debugCallback: (className:string, name:string, event:string, args:any[]) => void
+  static debugCallback: (className: string, name: string, event: string, args: any[], listeners: EventHandler[]) => void
   static executeListenerFunction: (func:Function[], args?: any[]) => void
 
   listenId: string
@@ -106,7 +106,7 @@ export class EventEmitter implements IEventEmitter, Destroyable {
     .concat(this._listeners['all']||[])
 
     if (EventEmitter.debugCallback)
-      EventEmitter.debugCallback((<any>this.constructor).name, (<any>this).name, eventName, args)
+      EventEmitter.debugCallback((<any>this.constructor).name, (<any>this).name, eventName, args, events)
 
     let event, a, len = events.length, index;
     let calls: Events[] = [];

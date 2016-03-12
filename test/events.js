@@ -33,6 +33,22 @@ describe('EventEmitter', function () {
     callback.callCount.should.equal(10);
     callback.calledOn(ctx).should.equal(true);
     callback.calledWith('args').should.equal(true)
+  });
+
+  it('should listenTo', function () {
+
+    let callback = sinon.spy();
+
+    let e = new EventEmitter();
+
+    this.emitter.listenTo(e, 'click', callback);
+
+    e.trigger('click');
+    e.trigger('click');
+
+    callback.callCount.should.equal(2);
+
+
   })
   
 });
