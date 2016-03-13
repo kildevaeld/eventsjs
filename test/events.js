@@ -38,16 +38,17 @@ describe('EventEmitter', function () {
   it('should listenTo', function () {
 
     let callback = sinon.spy();
-
+    let cb2 = sinon.spy();
     let e = new EventEmitter();
 
     this.emitter.listenTo(e, 'click', callback);
+    this.emitter.listenTo(e, 'all', cb2);
 
     e.trigger('click');
     e.trigger('click');
 
     callback.callCount.should.equal(2);
-
+    callback.callCount.should.equal(2);
 
   })
   

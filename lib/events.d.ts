@@ -24,7 +24,7 @@ export declare function callFunc(fn: Events[], args?: any[]): void;
 export declare function isFunction(a: any): a is Function;
 export declare function isEventEmitter(a: any): a is EventEmitter;
 export declare class EventEmitter implements IEventEmitter, Destroyable {
-    static debugCallback: (className: string, name: string, event: string, args: any[], listeners: EventHandler[]) => void;
+    static debugCallback: (className: string, name: string, event: string, args: any[], listeners: Events[]) => void;
     static executeListenerFunction: (func: Function[], args?: any[]) => void;
     listenId: string;
     private _listeners;
