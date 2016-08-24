@@ -29,7 +29,7 @@ gulp.task('bundle', ['build'], function () {
 		output: {
 			library: 'eventsjs',
 			libraryTarget: 'umd',
-			filename: 'eventsjs.js'
+			filename: 'events.js'
 		}
 	}))
 	.pipe(gulp.dest('dist'));
