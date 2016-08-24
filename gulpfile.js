@@ -27,9 +27,9 @@ gulp.task('bundle', ['build'], function () {
 	return gulp.src('lib/events.js')
 	.pipe(webpack({
 		output: {
-			library: 'events',
+			library: 'eventsjs',
 			libraryTarget: 'umd',
-			filename: 'events.js'
+			filename: 'eventsjs.js'
 		}
 	}))
 	.pipe(gulp.dest('dist'));
