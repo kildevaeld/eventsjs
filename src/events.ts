@@ -5,7 +5,7 @@ function getID (): string {
 }
 
 export class EventEmitterError extends Error {
-	constructor(public message?: string, public method?:string, public klass?: any, ctx?:any) {
+	constructor(public message?: string, public method?:string, public klass?: any, public ctx?:any) {
 		super(message);
 	}
 
@@ -66,6 +66,7 @@ export function isEventEmitter(a:any): a is EventEmitter {
 
 
 export class EventEmitter implements IEventEmitter, Destroyable {
+  static throwOnError: boolean = true;
   static debugCallback: (className: string, name: string, event: string, args: any[], listeners: Events[]) => void
   static executeListenerFunction: (func:Events[], args?: any[]) => void = function (func, args) {
   	callFunc(func, args);
@@ -115,6 +116,7 @@ export class EventEmitter implements IEventEmitter, Destroyable {
 
     }
 
+    return this;
   }
 
   trigger (eventName: string, ...args:any[]): any {
@@ -163,7 +165,9 @@ export class EventEmitter implements IEventEmitter, Destroyable {
 
   listenTo (obj: IEventEmitter, event: string, fn:EventHandler, ctx?:any, once:boolean = false): any {
   	  if (!isEventEmitter(obj)) {
-  	  	throw new EventEmitterError("obj is not an EventEmitter", once ? "listenToOnce" : "listenTo", this, obj);
+  	  	if (EventEmitter.throwOnError)
+  	  		throw new EventEmitterError("obj is not an EventEmitter", once ? "listenToOnce" : "listenTo", this, obj);
+  	  	return this;
   	  }
 
       let listeningTo, id, meth;
@@ -182,9 +186,12 @@ export class EventEmitter implements IEventEmitter, Destroyable {
   }
 
   stopListening (obj?: IEventEmitter, event?:string, callback?:EventHandler) {
-  	  if (!isEventEmitter(obj)) {
-  	  	throw new EventEmitterError("obj is not an EventEmitter", "stopListening", this, obj);
+  	  if (obj && !isEventEmitter(obj)) {
+  	  	if (EventEmitter.throwOnError)
+  	  		throw new EventEmitterError("obj is not an EventEmitter", "stopListening", this, obj);
+  	  	return this;
   	  }
+
       let listeningTo: any = this._listeningTo;
       if (!listeningTo) return this;
       var remove = !event && !callback;

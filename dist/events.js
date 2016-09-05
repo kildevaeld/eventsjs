@@ -71,6 +71,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.message = message;
 	        this.method = method;
 	        this.klass = klass;
+	        this.ctx = ctx;
 	    }
 	    EventEmitterError.prototype.toString = function () {
 	        var prefix = "EventEmitterError";
@@ -164,6 +165,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            }
 	        }
+	        return this;
 	    };
 	    EventEmitter.prototype.trigger = function (eventName) {
 	        var args = [];
@@ -205,7 +207,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    EventEmitter.prototype.listenTo = function (obj, event, fn, ctx, once) {
 	        if (once === void 0) { once = false; }
 	        if (!isEventEmitter(obj)) {
-	            throw new EventEmitterError("obj is not an EventEmitter", once ? "listenToOnce" : "listenTo", this, obj);
+	            if (EventEmitter.throwOnError)
+	                throw new EventEmitterError("obj is not an EventEmitter", once ? "listenToOnce" : "listenTo", this, obj);
+	            return this;
 	        }
 	        var listeningTo, id, meth;
 	        listeningTo = this._listeningTo || (this._listeningTo = {});
@@ -219,8 +223,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.listenTo(obj, event, fn, ctx, true);
 	    };
 	    EventEmitter.prototype.stopListening = function (obj, event, callback) {
-	        if (!isEventEmitter(obj)) {
-	            throw new EventEmitterError("obj is not an EventEmitter", "stopListening", this, obj);
+	        if (obj && !isEventEmitter(obj)) {
+	            if (EventEmitter.throwOnError)
+	                throw new EventEmitterError("obj is not an EventEmitter", "stopListening", this, obj);
+	            return this;
 	        }
 	        var listeningTo = this._listeningTo;
 	        if (!listeningTo)
@@ -242,6 +248,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.stopListening();
 	        this.off();
 	    };
+	    EventEmitter.throwOnError = true;
 	    EventEmitter.executeListenerFunction = function (func, args) {
 	        callFunc(func, args);
 	    };

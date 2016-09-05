@@ -2,6 +2,7 @@ export declare class EventEmitterError extends Error {
     message: string;
     method: string;
     klass: any;
+    ctx: any;
     constructor(message?: string, method?: string, klass?: any, ctx?: any);
     toString(): string;
 }
@@ -31,6 +32,7 @@ export declare function callFunc(fn: Events[], args?: any[]): void;
 export declare function isFunction(a: any): a is Function;
 export declare function isEventEmitter(a: any): a is EventEmitter;
 export declare class EventEmitter implements IEventEmitter, Destroyable {
+    static throwOnError: boolean;
     static debugCallback: (className: string, name: string, event: string, args: any[], listeners: Events[]) => void;
     static executeListenerFunction: (func: Events[], args?: any[]) => void;
     listenId: string;
