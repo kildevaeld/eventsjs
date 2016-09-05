@@ -1,7 +1,8 @@
 export declare class EventEmitterError extends Error {
     message: string;
     method: string;
-    constructor(message?: string, method?: string);
+    ctx: any;
+    constructor(message?: string, method?: string, ctx?: any);
     toString(): string;
 }
 export interface EventHandler {
