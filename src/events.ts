@@ -4,6 +4,20 @@ function getID (): string {
   return "" + (++idCounter)
 }
 
+export class EventEmitterError extends Error {
+	constructor(public message?: string, public method?:string) {
+		super(message);
+	}
+
+	toString() {
+		let prefix = "EventEmitterError";
+		if (this.method && this.method != "") {
+			prefix = `EventEmitter#${this.method}`;
+		}
+		return `${prefix}: ${this.message}`;
+	}
+}
+
 export interface EventHandler {
   (...args: any[])
 }
@@ -47,13 +61,15 @@ export function isFunction (a:any): a is Function {
 }
 
 export function isEventEmitter(a:any): a is EventEmitter {
-  return a instanceof EventEmitter || (isFunction(a.on) && isFunction(a.off) && isFunction(a.trigger));
+  return a && a instanceof EventEmitter || (isFunction(a.on) && isFunction(a.once) && isFunction(a.off) && isFunction(a.trigger));
 }
 
 
 export class EventEmitter implements IEventEmitter, Destroyable {
   static debugCallback: (className: string, name: string, event: string, args: any[], listeners: Events[]) => void
-  static executeListenerFunction: (func:Function[], args?: any[]) => void
+  static executeListenerFunction: (func:Events[], args?: any[]) => void = function (func, args) {
+  	callFunc(func, args);
+  }
 
   listenId: string
   private _listeners: { [key: string]: Events[] }
@@ -102,10 +118,9 @@ export class EventEmitter implements IEventEmitter, Destroyable {
   }
 
   trigger (eventName: string, ...args:any[]): any {
-    //let events = (this._listeners|| (this._listeners = {}))[eventName]||(this._listeners[eventName]=[])
-    //.concat(this._listeners['all']||[])
+    
     this._listeners = this._listeners || {};
-    let events = (this._listeners[eventName] || []).concat(this._listeners['all'] || []);
+    let events = (this._listeners[eventName] || []).concat(this._listeners['all'] || []).concat(this._listeners["*"] || []);
 
 
     if (EventEmitter.debugCallback)
@@ -113,21 +128,27 @@ export class EventEmitter implements IEventEmitter, Destroyable {
 
     let event, a, len = events.length, index;
     let calls: Events[] = [];
+    let alls: Events[] = [];
+
     for (let i=0, ii = events.length;i<ii;i++) {
       event = events[i]
       a = args
 
-      if (event.name == 'all') {
-        a = [eventName].concat(args)
-        callFunc([event], a);
+      if (events[i].name == 'all' || events[i].name == '*') {
+        alls.push(events[i]);
       } else {
-        calls.push(event)
+        calls.push(events[i]);
       }
 
-      if (event.once === true) {
-        index = this._listeners[event.name].indexOf(event)
-        this._listeners[event.name].splice(index,1)
+      if (events[i].once === true) {
+        index = this._listeners[events[i].name].indexOf(events[i])
+        this._listeners[events[i].name].splice(index,1)
       }
+    }
+
+    if (alls.length) {
+    	let a = [eventName].concat(args);
+    	this._executeListener(alls, a);
     }
 
     if (calls.length) this._executeListener(calls, args);
@@ -137,14 +158,14 @@ export class EventEmitter implements IEventEmitter, Destroyable {
   }
 
   _executeListener(func: Events[], args?: any[]) {
-      let executor = callFunc;
-      if ((<any>this.constructor).executeListenerFunction) {
-         executor = (<any>this.constructor).executeListenerFunction
-      }
-      executor(func, args);
+      EventEmitter.executeListenerFunction(func, args);
   }
 
   listenTo (obj: IEventEmitter, event: string, fn:EventHandler, ctx?:any, once:boolean = false): any {
+  	  if (!isEventEmitter(obj)) {
+  	  	throw new EventEmitterError("obj is not an EventEmitter", once ? "listenToOnce" : "listenTo");
+  	  }
+
       let listeningTo, id, meth;
       listeningTo = this._listeningTo|| (this._listeningTo = {});
       id = obj.listenId || (obj.listenId = getID())
@@ -161,6 +182,9 @@ export class EventEmitter implements IEventEmitter, Destroyable {
   }
 
   stopListening (obj?: IEventEmitter, event?:string, callback?:EventHandler) {
+  	  if (!isEventEmitter(obj)) {
+  	  	throw new EventEmitterError("obj is not an EventEmitter", "stopListening");
+  	  }
       let listeningTo: any = this._listeningTo;
       if (!listeningTo) return this;
       var remove = !event && !callback;
