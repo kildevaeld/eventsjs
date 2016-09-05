@@ -5,7 +5,7 @@ function getID (): string {
 }
 
 export class EventEmitterError extends Error {
-	constructor(public message?: string, public method?:string, public ctx?: any) {
+	constructor(public message?: string, public method?:string, public klass?: any, ctx?:any) {
 		super(message);
 	}
 
@@ -163,7 +163,7 @@ export class EventEmitter implements IEventEmitter, Destroyable {
 
   listenTo (obj: IEventEmitter, event: string, fn:EventHandler, ctx?:any, once:boolean = false): any {
   	  if (!isEventEmitter(obj)) {
-  	  	throw new EventEmitterError("obj is not an EventEmitter", once ? "listenToOnce" : "listenTo", obj);
+  	  	throw new EventEmitterError("obj is not an EventEmitter", once ? "listenToOnce" : "listenTo", this, obj);
   	  }
 
       let listeningTo, id, meth;
@@ -183,7 +183,7 @@ export class EventEmitter implements IEventEmitter, Destroyable {
 
   stopListening (obj?: IEventEmitter, event?:string, callback?:EventHandler) {
   	  if (!isEventEmitter(obj)) {
-  	  	throw new EventEmitterError("obj is not an EventEmitter", "stopListening", obj);
+  	  	throw new EventEmitterError("obj is not an EventEmitter", "stopListening", this, obj);
   	  }
       let listeningTo: any = this._listeningTo;
       if (!listeningTo) return this;
