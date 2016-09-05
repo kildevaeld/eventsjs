@@ -61,7 +61,7 @@ export function isFunction (a:any): a is Function {
 }
 
 export function isEventEmitter(a:any): a is EventEmitter {
-  return a && a instanceof EventEmitter || (isFunction(a.on) && isFunction(a.once) && isFunction(a.off) && isFunction(a.trigger));
+  return a && (a instanceof EventEmitter || (isFunction(a.on) && isFunction(a.once) && isFunction(a.off) && isFunction(a.trigger)));
 }
 
 

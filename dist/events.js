@@ -117,7 +117,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.isFunction = isFunction;
 	function isEventEmitter(a) {
-	    return a && a instanceof EventEmitter || (isFunction(a.on) && isFunction(a.once) && isFunction(a.off) && isFunction(a.trigger));
+	    return a && (a instanceof EventEmitter || (isFunction(a.on) && isFunction(a.once) && isFunction(a.off) && isFunction(a.trigger)));
 	}
 	exports.isEventEmitter = isEventEmitter;
 	var EventEmitter = (function () {
@@ -180,8 +180,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            event = events[i];
 	            a = args;
 	            if (events[i].name == 'all' || events[i].name == '*') {
-	                //a = [eventName].concat(args)
-	                //callFunc([events[i]], a);
 	                alls.push(events[i]);
 	            }
 	            else {
