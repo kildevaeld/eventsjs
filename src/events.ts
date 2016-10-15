@@ -334,13 +334,24 @@ export class EventEmitter implements IEventEmitter, Destroyable {
           let e = events[i];
           if ((fn == null && ctx != null && e.ctx === ctx) ||
             (fn != null && ctx == null && e.handler === fn) ||
-            (fn != null && ctx != null && e.handler === fn && e.ctx === ctx))
-            //if (events[i].handler == fn) {
+            (fn != null && ctx != null && e.handler === fn && e.ctx === ctx)) {
             this._listeners[eventName].splice(i, 1);
-          //}
+          }
         }
       }
 
+    } else {
+      for (let en in this.listeners) {
+        let l = this.listeners[en];
+        for (let i = 0, ii = l.length; i < ii; i++) {
+          let e = l[i];
+          if ((fn == null && ctx != null && e.ctx === ctx) ||
+            (fn != null && ctx == null && e.handler === fn) ||
+            (fn != null && ctx != null && e.handler === fn && e.ctx === ctx)) {
+            l.splice(i, 1);
+          }
+        }
+      }
     }
 
     return this;
