@@ -107,6 +107,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return EventEmitterError;
 	}(Error));
 	exports.EventEmitterError = EventEmitterError;
+	function removeFromListener(listeners, fn, ctx) {
+	    for (var i = 0; i < listeners.length; i++) {
+	        var e = listeners[i];
+	        if ((fn == null && ctx != null && e.ctx === ctx) ||
+	            (fn != null && ctx == null && e.handler === fn) ||
+	            (fn != null && ctx != null && e.handler === fn && e.ctx === ctx)) {
+	            listeners.splice(i, 1);
+	        }
+	    }
+	    return listeners;
+	}
 	/**
 	 *
 	 *
@@ -249,27 +260,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this._listeners[eventName] = [];
 	            }
 	            else {
-	                for (var i = 0; i < events.length; i++) {
-	                    var e = events[i];
-	                    if ((fn == null && ctx != null && e.ctx === ctx) ||
-	                        (fn != null && ctx == null && e.handler === fn) ||
-	                        (fn != null && ctx != null && e.handler === fn && e.ctx === ctx)) {
-	                        this._listeners[eventName].splice(i, 1);
-	                    }
-	                }
+	                /*for (let i = 0; i < events.length; i++) {
+	                  let e = events[i];
+	                  if ((fn == null && ctx != null && e.ctx === ctx) ||
+	                    (fn != null && ctx == null && e.handler === fn) ||
+	                    (fn != null && ctx != null && e.handler === fn && e.ctx === ctx)) {
+	                    this._listeners[eventName].splice(i, 1);
+	                  }
+	                }*/
+	                removeFromListener(events, fn, ctx);
 	            }
 	        }
 	        else {
 	            for (var en in this.listeners) {
 	                var l = this.listeners[en];
-	                for (var i = 0, ii = l.length; i < ii; i++) {
-	                    var e = l[i];
-	                    if ((fn == null && ctx != null && e.ctx === ctx) ||
-	                        (fn != null && ctx == null && e.handler === fn) ||
-	                        (fn != null && ctx != null && e.handler === fn && e.ctx === ctx)) {
-	                        l.splice(i, 1);
-	                    }
-	                }
+	                removeFromListener(l, fn, ctx);
 	            }
 	        }
 	        return this;

@@ -171,6 +171,20 @@ export interface Destroyable {
   destroy();
 }
 
+
+function removeFromListener(listeners: Events[], fn: EventHandler, ctx: any) {
+
+  for (let i = 0; i < listeners.length; i++) {
+    let e = listeners[i];
+    if ((fn == null && ctx != null && e.ctx === ctx) ||
+      (fn != null && ctx == null && e.handler === fn) ||
+      (fn != null && ctx != null && e.handler === fn && e.ctx === ctx)) {
+      listeners.splice(i, 1);
+    }
+  }
+  return listeners;
+}
+
 /**
  * 
  * 
@@ -330,27 +344,29 @@ export class EventEmitter implements IEventEmitter, Destroyable {
       if (fn == null && ctx == null) {
         this._listeners[eventName] = [];
       } else {
-        for (let i = 0; i < events.length; i++) {
+        /*for (let i = 0; i < events.length; i++) {
           let e = events[i];
           if ((fn == null && ctx != null && e.ctx === ctx) ||
             (fn != null && ctx == null && e.handler === fn) ||
             (fn != null && ctx != null && e.handler === fn && e.ctx === ctx)) {
             this._listeners[eventName].splice(i, 1);
           }
-        }
+        }*/
+        removeFromListener(events, fn, ctx);
       }
 
     } else {
       for (let en in this.listeners) {
         let l = this.listeners[en];
-        for (let i = 0, ii = l.length; i < ii; i++) {
+        removeFromListener(l, fn, ctx);
+        /*for (let i = 0; i < l.length; i++) {
           let e = l[i];
           if ((fn == null && ctx != null && e.ctx === ctx) ||
             (fn != null && ctx == null && e.handler === fn) ||
             (fn != null && ctx != null && e.handler === fn && e.ctx === ctx)) {
             l.splice(i, 1);
           }
-        }
+        }*/
       }
     }
 
