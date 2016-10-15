@@ -1,6 +1,6 @@
 {
   "name": "eventsjs",
-  "version": "0.2.10",
+  "version": "0.3.0",
   "description": "",
   "main": "lib/events.js",
   "scripts": {
@@ -10,12 +10,12 @@
   "license": "ISC",
   "devDependencies": {
     "gulp": "^3.9.1",
-    "gulp-typescript": "^2.10.0",
+    "gulp-typescript": "^2.14.1",
     "merge2": "^1.0.1",
     "mocha": "^2.4.5",
     "should": "^8.2.1",
-    "sinon": "^1.17.3",
-    "typescript": "^1.8.0",
+    "sinon": "^1.17.6",
+    "typescript": "^2.0.3",
     "webpack-stream": "^3.2.0"
   },
   "typings": "lib/events",
@@ -23,5 +23,4 @@
     "main": "dist/events.js",
     "format": "amd"
   }
-
 }

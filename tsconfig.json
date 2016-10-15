@@ -12,7 +12,8 @@
         "preserveConstEnums": true,
         "suppressImplicitAnyIndexErrors": true,
         "outDir": "./lib",
-        "rootDir": "./src"
+        "rootDir": "./src",
+        "noUnusedLocals": true
     },
     "filesGlob": [
         "./src/*.ts",
